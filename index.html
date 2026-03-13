@@ -1,28 +1,693 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>Gratitude App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#fef3c7">
+    <title>Благодарность</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi0JHRgNCw0L3RgtC40YDQvdGL0LkiLCJzaG9ydF9uYW1lIjoi0JHRgNCw0L3RgtC+Iiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmZWYzYzciLCJ0aGVtZV9jb2xvciI6IiNmZWYzYzciLCJpY29ucyI6W119">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #92400e;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #78350f;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .date {
+            font-size: 14px;
+            opacity: 0.8;
+            text-transform: capitalize;
+        }
+
+        .progress-section {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(146, 64, 14, 0.1);
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .progress-count {
+            font-size: 18px;
+            font-weight: 700;
+            color: #d97706;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(251, 191, 36, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .input-section {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(146, 64, 14, 0.1);
+            animation: fadeInUp 0.8s ease 0.4s both;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-section:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(146, 64, 14, 0.15);
+        }
+
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .input-wrapper:last-child {
+            margin-bottom: 0;
+        }
+
+        .gratitude-input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            border: 2px solid rgba(251, 191, 36, 0.3);
+            border-radius: 16px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #78350f;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .gratitude-input::placeholder {
+            color: #d97706;
+            opacity: 0.6;
+        }
+
+        .gratitude-input:focus {
+            border-color: #f59e0b;
+            background: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .number-badge {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 18px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .save-btn:active {
+            transform: scale(0.98);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .save-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .save-btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .history-section {
+            flex: 1;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #78350f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            border-radius: 16px;
+            border-left: 4px solid #f59e0b;
+            animation: slideIn 0.4s ease;
+            transition: transform 0.2s ease;
+        }
+
+        .history-item:hover {
+            transform: translateX(4px);
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #d97706;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .history-gratitudes {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .history-gratitude {
+            font-size: 14px;
+            color: #92400e;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .history-gratitude::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            color: #f59e0b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.6;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f59e0b;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(120, 53, 15, 0.95);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .delete-btn {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border: none;
+            color: #ef4444;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .history-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:active {
+            background: rgba(239, 68, 68, 0.2);
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .input-section {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <h1>Gratitude App</h1>
-        <div class="progress-bar">
-            <div class="progress" style="width: 0%;"></div>
+    <div class="container">
+        <header>
+            <h1>✨ Мои благодарности</h1>
+            <div class="date" id="currentDate"></div>
+        </header>
+
+        <div class="progress-section">
+            <div class="progress-header">
+                <span class="progress-text">Прогресс сегодня</span>
+                <span class="progress-count"><span id="completedCount">0</span>/3</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
         </div>
-        <div class="input-fields">
-            <input type="number" placeholder="Input 1">
-            <input type="number" placeholder="Input 2">
-            <input type="number" placeholder="Input 3">
+
+        <div class="input-section">
+            <div class="input-wrapper">
+                <div class="number-badge">1</div>
+                <input type="text" class="gratitude-input" id="input1" placeholder="Я благодарен(на) за..." maxlength="200">
+            </div>
+            <div class="input-wrapper">
+                <div class="number-badge">2</div>
+                <input type="text" class="gratitude-input" id="input2" placeholder="Я благодарен(на) за..." maxlength="200">
+            </div>
+            <div class="input-wrapper">
+                <div class="number-badge">3</div>
+                <input type="text" class="gratitude-input" id="input3" placeholder="Я благодарен(на) за..." maxlength="200">
+            </div>
+            <button class="save-btn" id="saveBtn" onclick="saveGratitudes()">
+                Сохранить благодарности
+            </button>
         </div>
-        <button id="saveBtn">Save</button>
+
         <div class="history-section">
-            <h2>History</h2>
-            <ul id="historyList"></ul>
+            <h2 class="section-title">
+                <span>📔</span>
+                <span>История</span>
+            </h2>
+            <div class="history-list" id="historyList">
+                <div class="empty-state">
+                    <div class="empty-icon">🌱</div>
+                    <div class="empty-text">Начни свой путь благодарности сегодня</div>
+                </div>
+            </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <div class="celebration" id="celebration"></div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDate();
+            loadTodayProgress();
+            loadHistory();
+            
+            // Автосохранение при вводе
+            ['input1', 'input2', 'input3'].forEach((id, index) => {
+                const input = document.getElementById(id);
+                input.addEventListener('input', () => {
+                    saveToLocalStorage(`today_${index + 1}`, input.value);
+                    updateProgress();
+                });
+                
+                // Enter для перехода к следующему полю
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const nextIndex = index + 2;
+                        if (nextIndex <= 3) {
+                            document.getElementById(`input${nextIndex}`).focus();
+                        } else {
+                            saveGratitudes();
+                        }
+                    }
+                });
+            });
+        });
+
+        function updateDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date().toLocaleDateString('ru-RU', options);
+            document.getElementById('currentDate').textContent = date;
+        }
+
+        function saveToLocalStorage(key, value) {
+            const today = new Date().toDateString();
+            const data = JSON.parse(localStorage.getItem('gratitude_draft') || '{}');
+            if (data.date !== today) {
+                data.date = today;
+                data.items = {};
+            }
+            data.items[key] = value;
+            localStorage.setItem('gratitude_draft', JSON.stringify(data));
+        }
+
+        function loadTodayProgress() {
+            const today = new Date().toDateString();
+            const data = JSON.parse(localStorage.getItem('gratitude_draft') || '{}');
+            
+            if (data.date === today && data.items) {
+                ['input1', 'input2', 'input3'].forEach((id, index) => {
+                    const value = data.items[`today_${index + 1}`] || '';
+                    document.getElementById(id).value = value;
+                });
+            }
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const inputs = [
+                document.getElementById('input1').value.trim(),
+                document.getElementById('input2').value.trim(),
+                document.getElementById('input3').value.trim()
+            ];
+            
+            const filled = inputs.filter(v => v.length > 0).length;
+            const percentage = (filled / 3) * 100;
+            
+            document.getElementById('completedCount').textContent = filled;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            
+            const btn = document.getElementById('saveBtn');
+            if (filled === 3) {
+                btn.textContent = '✨ Сохранить три благодарности';
+                btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            } else {
+                btn.textContent = 'Сохранить благодарности';
+                btn.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+            }
+        }
+
+        function saveGratitudes() {
+            const inputs = [
+                document.getElementById('input1').value.trim(),
+                document.getElementById('input2').value.trim(),
+                document.getElementById('input3').value.trim()
+            ];
+            
+            const validInputs = inputs.filter(v => v.length > 0);
+            
+            if (validInputs.length === 0) {
+                showToast('Напиши хотя бы одну благодарность 💛');
+                return;
+            }
+            
+            const entry = {
+                date: new Date().toISOString(),
+                items: validInputs,
+                id: Date.now()
+            };
+            
+            // Сохраняем в историю
+            const history = JSON.parse(localStorage.getItem('gratitude_history') || '[]');
+            
+            // Проверяем, не сохраняли ли уже сегодня
+            const today = new Date().toDateString();
+            const existingToday = history.find(h => new Date(h.date).toDateString() === today);
+            
+            if (existingToday) {
+                // Обновляем существующую запись
+                existingToday.items = validInputs;
+            } else {
+                history.unshift(entry);
+            }
+            
+            localStorage.setItem('gratitude_history', JSON.stringify(history));
+            
+            // Очищаем черновик
+            localStorage.removeItem('gratitude_draft');
+            
+            // Очищаем поля
+            document.getElementById('input1').value = '';
+            document.getElementById('input2').value = '';
+            document.getElementById('input3').value = '';
+            updateProgress();
+            
+            // Эффекты
+            if (validInputs.length === 3) {
+                createConfetti();
+                showToast('Прекрасно! Три благодарности сохранены ✨');
+            } else {
+                showToast(`Сохранено ${validInputs.length} благодарностей`);
+            }
+            
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('gratitude_history') || '[]');
+            const container = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🌱</div>
+                        <div class="empty-text">Начни свой путь благодарности сегодня</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = history.map(entry => {
+                const date = new Date(entry.date);
+                const dateStr = date.toLocaleDateString('ru-RU', { 
+                    day: 'numeric', 
+                    month: 'long',
+                    weekday: 'short'
+                });
+                const isToday = date.toDateString() === new Date().toDateString();
+                
+                return `
+                    <div class="history-item" style="position: relative;">
+                        <button class="delete-btn" onclick="deleteEntry(${entry.id})" title="Удалить">×</button>
+                        <div class="history-date">${dateStr} ${isToday ? '• Сегодня' : ''}</div>
+                        <div class="history-gratitudes">
+                            ${entry.items.map(item => `<div class="history-gratitude">${escapeHtml(item)}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteEntry(id) {
+            if (!confirm('Удалить эту запись?')) return;
+            
+            let history = JSON.parse(localStorage.getItem('gratitude_history') || '[]');
+            history = history.filter(h => h.id !== id);
+            localStorage.setItem('gratitude_history', JSON.stringify(history));
+            loadHistory();
+            showToast('Запись удалена');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function createConfetti() {
+            const container = document.getElementById('celebration');
+            const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    container.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 4000);
+                }, i * 30);
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Регистрация Service Worker для PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript,' + encodeURIComponent(`
+                self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => new Response('Offline'))));
+            `)).catch(() => {});
+        }
+    </script>
 </body>
 </html>
